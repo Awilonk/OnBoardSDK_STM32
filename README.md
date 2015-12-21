@@ -3,12 +3,12 @@
 ##简介
 本工程使用stm32f407Discovery开发板测试。使用串口和开发板通信，发送指令。  
 采用四线串口协议，如果PC上没有串口，建议使用USB转串口模块，如MAX232、PL2303、CP2102等
-在使用本例程前请确认你已经**仔细阅读过**有关OnboardSDK的所有**[文档](https://developer.dji.com/cn/onboard-sdk/documentation/ProgrammingGuide/)**
+在使用本例程前请确认你已经**仔细阅读过**有关OnboardSDK的**[所有文档](https://developer.dji.com/cn/onboard-sdk/documentation/ProgrammingGuide/)**
 ##硬件接口
   使用USART2作为Debug通道。端口为PB10，PB11分别对应USART2的TX、RX，波特率为**115200**，此处的波特率必须和串口调试助手的波特率**一致**；  
 使用USART3作为和M100上的N1飞控通信的接口。端口为PA2、PA3分别对应USART3的TX、RX，和N1飞控的“USART_CAN2”端口连接。波特率为 **921600**.此处的波特率必须和N1飞控的波特率**一致**，可以在DJI调参软件中调整；
 ##开始使用
-###第一次使用前请连接手机和遥控器，并按照官网提示激活飞机。更多关于[激活](https://developer.dji.com/cn/onboard-sdk/documentation/ActivationGuide/)
+###第一次使用前请连接手机和遥控器，并按照官网提示激活飞机。[更多关于激活](https://developer.dji.com/cn/onboard-sdk/documentation/ActivationGuide/)
 第一次激活后可以使用虚拟遥控功能替代实体遥控器
 ###操作步骤
 1. 将M100上电（**注意，测试时请将螺旋桨拆下**）
