@@ -1,10 +1,4 @@
 
-First Header  | Second Header
-------------- | -------------
-Content Cell  | Content Cell
-Content Cell  | Content Cell
-
-
 #DJI Onboard STM32 例程
 ##简介
 本工程使用stm32f407Discovery开发板测试。使用串口和开发板通信，发送指令。  
@@ -63,12 +57,12 @@ PC上，所以在PC上的串口调试助手中**发送端选择HEX发送**，**�
 
 0xFA 0xFB 0x04 0x01 0x91 0x00 0x00 0x00 0x00 0x00 0x20 0x00 0x00 0xFE
 
-其中 0x04 0x01为选择自行输入航点参数
-0x91 为模式标志字节  选择的模式为VERT_POS HORI_POS YAW_RATE Ground系 增稳模式
-0x00 0x00 为X方向距离为0
-0x00 0x00 为Y方向距离为0
-0x01 0xf4 为Z方向距离为5.00m
-0x00 0x00 为YAW方向不旋转
+其中 0x04 0x01为选择自行输入航点参数   
+0x91 为模式标志字节  选择的模式为VERT_POS HORI_POS YAW_RATE Ground系 增稳模式  
+0x00 0x00 为X方向距离为0   
+0x00 0x00 为Y方向距离为0  
+0x01 0xf4 为Z方向距离为5.00m  
+0x00 0x00 为YAW方向不旋转  
 
 注意:HORI_POS模式的输入量是相对位置的净输入量。净输入量通过GPS或Guidance等传感器获得位置移动的反馈信息，与输入作差后得到。
      为完成飞行的位置控制，需要连续获得反馈并发送该命令，以达到平稳的控制效果。
