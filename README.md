@@ -179,7 +179,20 @@ Command as below has been added to program.More command should adapter by yourse
 |Virtual Rc off 	 	|0xFA 0xFB 0x06 0x00 0xFE | 
 |Start HotPoint 	 	|0xFA 0xFB 0x07 0x00 0xFE (paramenters are preset,configure it by yourself)| 
 
+The Localpositionnavigation function need to enter parameter by yourself.Here gives an example.
 
+
+0xFA 0xFB 0x04 0x01 0x91 0x00 0x00 0x00 0x00 0x00 0x20 0x00 0x00 0xFE
+
+Amoug them, 0x04 0x01 means to choose the Localpositionnacigation.  
+0x91 is the Control mode byte which is choosing *VERT_POS* ，*HORI_POS* ，*YAW_RATE*， *Ground系* ，*stable mode*.  
+
+
++ 0x00 0x00 is the distance of X direction is 0;
++ 0x00 0x00 is the distance of Y direction is 0;
++ 0x01 0xf4 is the distance of Z direction is 5.00m;
++ 0x00 0x00 is the Yaw direction don't rotate.
+  
 
 
 *Attention:The input of HORI_POS is a position offset instead of an actual position. This design aims to take both GPS flight and vision-based flight into consideration. If the developer wants to use GPS navigation, the GPS information sent by the UAV can be used to calculate position offset. While in vision-based flight application, developers should have their own positioning device (along with Gudiance or GPS to provide velocity measurement) to do position control. For example, xuhao1 SDK package implements a GPS-based position control where target position can be passed as GPS coordinate.*   
@@ -191,7 +204,7 @@ The command should be send in sequence.
 A normal order of it are as below:  
 
 
-![流程图](image/流程图.png)  
+![flow](image/flow.png)  
 
 If using Virtual RC,the real RC **can no control the UAV**.When losing signal of Virtual RC longer than 1s,UAV would Land or cutt off to real RC.  
 This program choose to land after losing Virtual RC
