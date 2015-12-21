@@ -43,16 +43,16 @@
 ![初始化成功](/image/初始化成功.png)
 ###指令格式
 ---
-一帧指令由帧头，指令集，指令，数据(可选),帧尾 构成;  
-第一第二个字节为帧头，固定为0xFA 0xFB。
-第三、第四个字节为指令。
-中间可能会有数据字节，
-最后一个字节为帧结束字节。
++ 一帧指令由帧头，指令集，指令，数据(可选),帧尾 构成;  
+- 第一第二个字节为帧头，固定为0xFA 0xFB。
+- 第三、第四个字节为指令。
+- 中间可能会有数据字节，
++ 最后一个字节为帧结束字节。
 
 ---
 单片机接收到帧结束字节0xFE后会立即开始一次命令响应。
 
-注意：这里所指的指令是PC向stm32发送的命令，发送时请勾选**Hex发送**而不是ASCII发送。M100发回来的调试信息也会发送到
+>注意：这里所指的指令是PC向stm32发送的命令，发送时请勾选**Hex发送**而不是ASCII发送。M100发回来的调试信息也会发送到
 PC上，所以在PC上的串口调试助手中**发送端选择HEX发送**，**接收端选择ASCII接收**，波特率为115200
 
 例如：0xFA 0xFB 0x02 0x01 0xFE
@@ -146,18 +146,18 @@ If the Hardware has been set correctly,reset your stm32.If everything is ok,ther
 
 ###Command Format
 ---
-The protocol frame consist of Frame Header,Command,Data(optional),Frame Footer;  
-The first and second byte is frame header.  
-The third and fourth is command .  
-Followed is data(optional).  
-The last byte is frame booter.  
++ The protocol frame consist of Frame Header,Command,Data(optional),Frame Footer;  
+- The first and second byte is frame header.  
+- The third and fourth is command .  
+- Followed is data(optional).  
++ The last byte is frame booter.  
 
 
 ---
 
 When the microcontroller receive a "0xfe" would lead to a command response immediately.  
 
-Attention:Please configure your serial debugging assistant on **Hex transmit** and **ASCII receive**,BuadRate is 115200.
+>Attention:Please configure your serial debugging assistant on **Hex transmit** and **ASCII receive**,BuadRate is 115200.
 
 For instance:  0xFA 0xFB 0x02 0x01 0xFE
 
@@ -170,11 +170,11 @@ Command as below has been added to program.More command should adapter by yourse
 |Obtain control   		|0xFA 0xFB 0x02 0x01 0xFE|  
 |Relese control   	 	|0xFA 0xFB 0x02 0x00 0xFE | 
 |Arm    		 	|0xFA 0xFB 0x03 0x01 0xFE|  
-|  		 	|0xFA 0xFB 0x03 0x00 0xFE|  
-|一键返航  		 	|0xFA 0xFB 0x05 0x01 0xFE|  
-|一键起飞  		 	|0xFA 0xFB 0x05 0x02 0xFE|  
-|一键降落  		 	|0xFA 0xFB 0x05 0x03 0xFE|  
-|虚拟遥控开启（A档） |0xFA 0xFB 0x06 0x01 0xFE  |
-|虚拟遥控开启（F档） |0xFA 0xFB 0x06 0x02 0xFE  |
-|虚拟遥控关闭 	 	|0xFA 0xFB 0x06 0x00 0xFE | 
-|开启热点功能 	 	|0xFA 0xFB 0x07 0x00 0xFE (参数已经预设,可以根据需要在程序中调整)| 
+|Disarm 		 	|0xFA 0xFB 0x03 0x00 0xFE|  
+|Return to home(RTH)|0xFA 0xFB 0x05 0x01 0xFE|  
+|Auto take off  	|0xFA 0xFB 0x05 0x02 0xFE|  
+|Auto landing  		|0xFA 0xFB 0x05 0x03 0xFE|  
+|Virtual RC on(mode A) |0xFA 0xFB 0x06 0x01 0xFE  |
+|Virtual RC on(mode F) |0xFA 0xFB 0x06 0x02 0xFE  |
+|Virtual Rc off 	 	|0xFA 0xFB 0x06 0x00 0xFE | 
+|Start HotPoint 	 	|0xFA 0xFB 0x07 0x00 0xFE (paramenters are preset,configure it by yourself)| 
