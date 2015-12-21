@@ -84,4 +84,4 @@ PC上，所以在PC上的串口调试助手中**发送端选择HEX发送**，**�
 本例程中选择了失去虚拟遥控后直接降落模式。   
 
 
-![giftest](/image/giftest.gif)
+![giftest](/image/gif.gif)
