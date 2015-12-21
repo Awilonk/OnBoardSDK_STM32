@@ -1,4 +1,4 @@
-[English](#DJI Onboard STM32 Example Program) | [中文](#DJI Onboard STM32 例程)
+[English](#DJI-Onboard-STM32-Example-Program) |  [中文](#DJI-Onboard-STM32-例程)
 
 #DJI Onboard STM32 例程
 ##简介
@@ -106,4 +106,7 @@ PC上，所以在PC上的串口调试助手中**发送端选择HEX发送**，**�
 下面这个小动画演示了 读取版本信息->激活->打开虚拟遥控A档->虚拟遥控F档->获取控制权->一键起飞->打开热点功能->一键返航->关闭虚拟遥控功能。的过程
 ![giftest](/image/gif.gif)
 
+----------
+
 #DJI Onboard STM32 Example Program
+##Introduction
