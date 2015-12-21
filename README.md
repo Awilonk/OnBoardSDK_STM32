@@ -110,3 +110,4 @@ PC上，所以在PC上的串口调试助手中**发送端选择HEX发送**，**�
 
 #DJI Onboard STM32 Example Program
 ##Introduction
+This project use stm32f407Discovery demoboard for testing,Keil uVision5 to complie.
