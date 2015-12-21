@@ -1,4 +1,4 @@
-[English](#Introduction) |  [中文](#DJI-Onboard-STM32-例程)
+[English](#DJI-Onboard-STM32-Example-Program) |  [中文](#DJI-Onboard-STM32-例程)
 
 #DJI Onboard STM32 例程
 ##简介
