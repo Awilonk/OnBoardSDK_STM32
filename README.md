@@ -115,8 +115,12 @@ Use 4-wire-serial interface.If your computer do no has one,USB-TTL serial cable 
 
 
 ##content
-
-
+1. [Hardware Installation](#hardware-installation) 
+2. [Getting Start](#getting-start)
+   - [How to operate](#how-to-operate)
+   - [Command Format](#command-format)
+   - [How to send command](#how-to-send-command)
+3. [Gif Demonstration](#gif-demonstration)
 
 
 ----------
@@ -135,6 +139,7 @@ Use USART3 for communicating with M100.PA2,PA3 as TX,RX,which should be plug in 
 >After the first activate,a VIRTUAL REMOTE CONTROL can take the place of remote control.  
 
 ###How to operate
+
 1. power on your M100 **warning!:remove the propellers if you are no sure !!**
 2. when it's booted,connect stm32 with M100.Since there is no 3v/5v power interface on M100.**Please settle it by yourself.**Using a 26v to 5v Voltage Converter or UBEC(Ultra Battery Elimination Circuit) or ever a carrying a POWER BANK is OK.
 3. Connect stm32 with PC by serial interface.Extension cord and wireless seral port are recommened when you are doing a test.
@@ -211,5 +216,5 @@ This program choose to land after losing Virtual RC
 ---
 ###Gif Demonstration
 This little gif demonstrate how to send command using Serial debugging assistant.  
-Read current version->Activate->Turn VRC to mode A->Turn VRC to mode F->Obtain control->Take off->Start HotPoint->GoHome->Turn VRC.
+Read current version->Activate->Turn VRC to mode A->Turn VRC to mode F->Obtain control->Take off->Start HotPoint->GoHome->Turn VRC.  
 ![giftest](/image/gif.gif)
