@@ -179,8 +179,19 @@ Command as below has been added to program.More command should adapter by yourse
 |Virtual Rc off 	 	|0xFA 0xFB 0x06 0x00 0xFE | 
 |Start HotPoint 	 	|0xFA 0xFB 0x07 0x00 0xFE (paramenters are preset,configure it by yourself)| 
 
+
+
+
 *Attention:The input of HORI_POS is a position offset instead of an actual position. This design aims to take both GPS flight and vision-based flight into consideration. If the developer wants to use GPS navigation, the GPS information sent by the UAV can be used to calculate position offset. While in vision-based flight application, developers should have their own positioning device (along with Gudiance or GPS to provide velocity measurement) to do position control. For example, xuhao1 SDK package implements a GPS-based position control where target position can be passed as GPS coordinate.*   
 
 ---  
-###
+###How to send command  
+The command should be send in sequence.  
 
+A normal order of it are as below:  
+
+
+![流程图](image/流程图.png)  
+
+If using Virtual RC,the real RC **can no control the UAV**.When losing signal of Virtual RC longer than 1s,UAV would Land or cutt off to real RC.  
+This program choose to land after losing Virtual RC
