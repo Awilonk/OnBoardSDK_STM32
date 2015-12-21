@@ -135,9 +135,11 @@ Use USART3 for communicating with M100.PA2,PA3 as TX,RX,which should be plug in 
 >After the first activate,a VIRTUAL REMOTE CONTROL can take the place of remote control.  
 
 ###How to operate
-1. power on your M100 **warning!:remove the propellers !!**
+1. power on your M100 **warning!:remove the propellers if you are no sure !!**
 2. when it's booted,connect stm32 with M100.Since there is no 3v/5v power interface on M100.**Please settle it by yourself.**Using a 26v to 5v Voltage Converter or UBEC(Ultra Battery Elimination Circuit) or ever a carrying a POWER BANK is OK.
 3. Connect stm32 with PC by serial interface.Extension cord and wireless seral port are recommened when you are doing a test.
 
 All the communication in this program **has been set to UNENCRYPTED**.If necessary,configre it in the program by yourself.
 
+If the Hardware has been set correctly,reset your stm32.If everything is ok,there would be a version infomation callback by M100.Therefrom,system is ready for your command.
+![初始化成功](/image/初始化成功.png)
