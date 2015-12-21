@@ -110,4 +110,34 @@ PC上，所以在PC上的串口调试助手中**发送端选择HEX发送**，**�
 
 #DJI Onboard STM32 Example Program
 ##Introduction
-This project use stm32f407Discovery demoboard for testing,Keil uVision5 to complie.
+This project use stm32f407Discovery demoboard for testing,Keil uVision5 to complie.Use serial port interface to communicate with demoboard or send out command to M100.  
+Use 4-wire-serial interface.If your computer do no has one,USB-TTL serial cable is necessary.CP2102 is recommend.Before using this example program,make sure you have **read all [documents](https://developer.dji.com/cn/onboard-sdk/documentation/ProgrammingGuide/) about OnboardSDK carefully.**  
+
+
+##content
+
+
+
+
+----------
+
+
+
+
+##Hardware Installation
+Use USART2 for debug.PB10,PB11 as TX,RX.BaudRate is **115200**.BaudRate here must be **the same as** BaudRate in your Serial debugging assistant.;
+
+Use USART3 for communicating with M100.PA2,PA3 as TX,RX,which should be plug in the "USART_CAN2" prot.The BaudRate here should equal to BaudRate of N1 flight control system on M100,which can be adjust on
+"DJI Assistant".
+![硬件串口](image/硬件串口.png)
+##Getting Start
+>The first connection between stm32f4 and M100 **MUST** use DJI GO and remote control.[More about activate](https://developer.dji.com/cn/onboard-sdk/documentation/ActivationGuide/)  
+>After the first activate,a VIRTUAL REMOTE CONTROL can take the place of remote control.  
+
+###How to operate
+1. power on your M100 **warning!:remove the propellers !!**
+2. when it's booted,connect stm32 with M100.Since there is no 3v/5v power interface on M100.**Please settle it by yourself.**Using a 26v to 5v Voltage Converter or UBEC(Ultra Battery Elimination Circuit) or ever a carrying a POWER BANK is OK.
+3. Connect stm32 with PC by serial interface.Extension cord and wireless seral port are recommened when you are doing a test.
+
+All the communication in this program **has been set to UNENCRYPTED**.If necessary,configre it in the program by yourself.
+
