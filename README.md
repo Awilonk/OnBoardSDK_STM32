@@ -131,7 +131,7 @@ Use USART3 for communicating with M100.PA2,PA3 as TX,RX,which should be plug in 
 "DJI Assistant".
 ![硬件串口](image/硬件串口.png)
 ##Getting Start
->The first connection between stm32f4 and M100 **MUST** use DJI GO and remote control.[More about activate](https://developer.dji.com/cn/onboard-sdk/documentation/ActivationGuide/)  
+>The first connection between stm32f4 and M100 **MUST** use your mobile device and remote control.[More about activate](https://developer.dji.com/cn/onboard-sdk/documentation/ActivationGuide/)  
 >After the first activate,a VIRTUAL REMOTE CONTROL can take the place of remote control.  
 
 ###How to operate
@@ -143,3 +143,38 @@ All the communication in this program **has been set to UNENCRYPTED**.If necessa
 
 If the Hardware has been set correctly,reset your stm32.If everything is ok,there would be a version infomation callback by M100.Therefrom,system is ready for your command.
 ![初始化成功](/image/初始化成功.png)
+
+###Command Format
+---
+The protocol frame consist of Frame Header,Command,Data(optional),Frame Footer;  
+The first and second byte is frame header.  
+The third and fourth is command .  
+Followed is data(optional).  
+The last byte is frame booter.  
+
+
+---
+
+When the microcontroller receive a "0xfe" would lead to a command response immediately.  
+
+Attention:Please configure your serial debugging assistant on **Hex transmit** and **ASCII receive**,BuadRate is 115200.
+
+For instance:  0xFA 0xFB 0x02 0x01 0xFE
+
+Command as below has been added to program.More command should adapter by yourself if needed.
+
+|Command          | Code for command             |
+|:-----------------|:------------------|  
+|Get current version   | 0xFA 0xFB 0x00 0xFE |
+|Send activate information | 0xFA 0xFB 0x01 0xFE | 
+|Obtain control   		|0xFA 0xFB 0x02 0x01 0xFE|  
+|Relese control   	 	|0xFA 0xFB 0x02 0x00 0xFE | 
+|Arm    		 	|0xFA 0xFB 0x03 0x01 0xFE|  
+|  		 	|0xFA 0xFB 0x03 0x00 0xFE|  
+|一键返航  		 	|0xFA 0xFB 0x05 0x01 0xFE|  
+|一键起飞  		 	|0xFA 0xFB 0x05 0x02 0xFE|  
+|一键降落  		 	|0xFA 0xFB 0x05 0x03 0xFE|  
+|虚拟遥控开启（A档） |0xFA 0xFB 0x06 0x01 0xFE  |
+|虚拟遥控开启（F档） |0xFA 0xFB 0x06 0x02 0xFE  |
+|虚拟遥控关闭 	 	|0xFA 0xFB 0x06 0x00 0xFE | 
+|开启热点功能 	 	|0xFA 0xFB 0x07 0x00 0xFE (参数已经预设,可以根据需要在程序中调整)| 
