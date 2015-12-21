@@ -18,8 +18,10 @@
 使用USART3作为和M100上的N1飞控通信的接口。端口为PA2、PA3分别对应USART3的TX、RX，和N1飞控的“USART_CAN2”端口连接。波特率为 **921600**.此处的波特率必须和N1飞控的波特率**一致**，可以在DJI调参软件中调整；
 ![硬件串口](image/硬件串口.png)
 ##开始使用
->第一次使用前请连接手机和遥控器，并按照官网提示激活飞机。[更多关于激活](https://developer.dji.com/cn/onboard-sdk/documentation/ActivationGuide/)
-第一次激活后可以使用虚拟遥控功能替代实体遥控器
+>第一次使用前请连接手机和遥控器，并按照官网提示激活飞机。[更多关于激活](https://developer.dji.com/cn/onboard-sdk/documentation/ActivationGuide/)  
+第一次激活后可以使用虚拟遥控功能替代实体遥控器  
+
+
 ###操作步骤
 1. 将M100上电（**注意，测试时请将螺旋桨拆下**）
 
