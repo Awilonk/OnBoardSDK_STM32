@@ -1,3 +1,8 @@
+| Left Aligned |  Center Aligned  | Right Aligned |
+|:-------------|:----------------:| -------------:|
+| Left | Center | Right |
+| Left Aligned | Center Aligned | Right Aligned |
+
 
 #本工程使用stm32f407Discovery开发板测试。使用串口和开发板通信，发送指令。
 采用四线串口协议，如果PC上没有串口，建议使用USB转串口模块，如MAX232、PL2303、CP2102等
