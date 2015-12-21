@@ -207,4 +207,9 @@ A normal order of it are as below:
 ![flow](image/flow.png)  
 
 If using Virtual RC,the real RC **can no control the UAV**.When losing signal of Virtual RC longer than 1s,UAV would Land or cutt off to real RC.  
-This program choose to land after losing Virtual RC
+This program choose to land after losing Virtual RC  
+---
+###Gif Demonstration
+This little gif demonstrate how to send command using Serial debugging assistant.  
+Read current version->Activate->Turn VRC to mode A->Turn VRC to mode F->Obtain control->Take off->Start HotPoint->GoHome->Turn VRC.
+![giftest](/image/gif.gif)
