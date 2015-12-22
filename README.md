@@ -216,5 +216,6 @@ This program choose to land after losing Virtual RC
 ---
 ###Gif Demonstration
 This little gif demonstrate how to send command using Serial debugging assistant.  
+It shows a typical command flow like:
 Read current version->Activate->Turn VRC to mode A->Turn VRC to mode F->Obtain control->Take off->Start HotPoint->GoHome->Turn VRC.  
 ![giftest](/image/gif.gif)
