@@ -20,7 +20,7 @@
 #ifndef DJI_API_H
 #define DJI_API_H
 #include "DJI_Type.h"
-#include "DJI_Mission.h"
+//#include "DJI_Mission.h"
 
 #include "DJI_HardDriver.h"
 #include "DJI_App.h"
@@ -75,18 +75,44 @@ enum CMD_SET
     SET_CONTROL = 0x01,
     SET_BROADCAST = 0x02,
     SET_MISSION = 0x03,
+    SET_SYNC = 0x04,
     SET_VIRTUALRC = 0x05
+};
+
+enum SYNC_CODE
+{
+    CODE_SYNC_BROADCAST = 0x00
 };
 
 enum HOTPOINT_CODE
 {
     CODE_HOTPOINT_START = 0x20,
     CODE_HOTPOINT_STOP = 0x21,
-    CODE_HOTPOINT_PAUSE = 0x22,
+    CODE_HOTPOINT_SETPAUSE = 0x22,
     CODE_HOTPOINT_PALSTANCE = 0x23,
     CODE_HOTPOINT_RADIUS = 0x24,
     CODE_HOTPOINT_SETYAW = 0x25,
     CODE_HOTPOINT_LOAD = 0x26
+};
+
+enum FOLLOW_CODE
+{
+    CODE_FOLLOW_START = 0x30,
+    CODE_FOLLOW_STOP = 0x31,
+    CODE_FOLLOW_SETPAUSE = 0X32,
+    CODE_FOLLOW_TARGET = 0X33
+};
+
+enum WAYPOINT_CODE
+{
+    CODE_WAYPOINT_INIT = 0x10,
+    CODE_WAYPOINT_ADDPOINT = 0x11,
+    CODE_WAYPOINT_SETSTART = 0x12,
+    CODE_WAYPOINT_SETPAUSE = 0x13,
+    CODE_WAYPOINT_DOWNLOAD = 0x14,
+    CODE_WAYPOINT_INDEX = 0x15,
+    CODE_WAYPOINT_SETVELOCITY = 0x16,
+    CODE_WAYPOINT_GETVELOCITY = 0x17,
 };
 
 enum ACTIVATION_CODE
@@ -130,6 +156,16 @@ enum MISSION_TYPE
     MISSION_IOC
 };
 
+enum BROADCAST_FREQ
+{
+    BROADCAST_FREQ_0HZ = 0,
+    BROADCAST_FREQ_1HZ = 1,
+    BROADCAST_FREQ_10HZ = 2,
+    BROADCAST_FREQ_50HZ = 3,
+    BROADCAST_FREQ_100HZ = 4,
+    BROADCAST_FREQ_HOLD = 5,
+};
+
 class CoreAPI
 {
     /*! @brief
@@ -163,12 +199,8 @@ class CoreAPI
     /*! @note Core Control API
      *  void send(); is a core overloaded funtion. which has three ways invoked.
      *
-     *  void send(CallbackCommand *parameter) is a main funcion, other two
+     *  void send(CallbackCommand *parameter) is a main interface, other two
      *  overloaded functions are builded on the base of this function.
-     *
-     *  The difference between CallBack and Handler is whether we have user
-     *  defined data passing in while entering a callback handler.
-     *
      *
      *  Please be careful when passing in UserData, there might have memory leak
      *  problems.
@@ -176,23 +208,20 @@ class CoreAPI
     void ack(req_id_t req_id, unsigned char *ackdata, int len);
     void send(unsigned char session_mode, unsigned char is_enc, CMD_SET cmd_set,
               unsigned char cmd_id, void *pdata, int len, CallBack ack_callback,
-              int timeout = 0, int retry_time = 1);
+              int timeout = 0, int retry_time = 1); //! @note compatible for DJI_APP_Pro_send
+    void send(unsigned char session_mode, bool is_enc, CMD_SET cmd_set, unsigned char cmd_id,
+              void *pdata, size_t len, int timeout = 0, int retry_time = 1,
+              CallBack ack_handler = 0,
+              UserData userData = 0); //! @note better interface entrance
+    void send(Command *parameter);	//! @note main interface
 
-    void send(unsigned char session_mode, unsigned char is_enc, CMD_SET cmd_set,
-              unsigned char cmd_id, void *pdata, int len, int timeout = 0,
-              int retry_time = 1, CallBack ack_handler = 0,
-              UserData userData = 0);
-    void send(CallbackCommand *parameter);
-
-    void activate(ActivateData *data, CallBack callback = 0,
-                  UserData userData = 0);
+    void activate(ActivateData *data, CallBack callback = 0, UserData userData = 0);
     void setControl(bool enable, CallBack callback = 0, UserData userData = 0);
     void getVersion(CallBack callback = 0, UserData userData = 0);
-    void sendToMobile(uint8_t *data, uint8_t len, CallBack callback = 0,
-                      UserData userData = 0);
-    void setBroadcastFeq(uint8_t *data, CallBack callback = 0,
-                         UserData userData = 0);
+    void sendToMobile(uint8_t *data, uint8_t len, CallBack callback = 0, UserData userData = 0);
+    void setBroadcastFreq(uint8_t *dataLenIs16, CallBack callback = 0, UserData userData = 0);
     void setActivation(bool isActivated);
+    void setSyncFreq(uint32_t freqInHz);
     void setKey(const char *key);
 
     //! @note Core read API
@@ -205,21 +234,23 @@ class CoreAPI
     //! @note call back functions
   public:
     //! @note Recevie data callback enterance
-    void setBroadcastCallback(CallBackHandler callback);
-    void setBroadcastCallback(CallBack handler, UserData userData);
+    void setBroadcastCallback(CallBackHandler callback) { broadcastCallback = callback; }
+    void setHotPointCallback(CallBackHandler callback) {hotPointCallback = callback;}
+    void setWayPointCallback(CallBackHandler callback) {wayPointCallback = callback;}
+    void setFollowCallback(CallBackHandler callback) {followCallback = callback;}
+    void setBroadcastCallback(CallBack handler, UserData userData = 0);
     void setFromMobileCallback(CallBackHandler FromMobileEntrance);
 
-    //! @note user callback sample
-    static void activateCallback(CoreAPI *This, Header *header,
-                                 UserData userData = 0);
-    static void getVersionCallback(CoreAPI *This, Header *header,
-                                   UserData userData = 0);
-    static void setControlCallback(CoreAPI *This, Header *header,
-                                   UserData userData = 0);
-    static void sendToMobileCallback(CoreAPI *This, Header *header,
-                                     UserData userData = 0);
-    static void setFrequencyCallback(CoreAPI *This, Header *header,
-                                     UserData userData = 0);
+    /*! @note user callback sample
+     *  @attention We can also use none-static function as a callback function.
+     *  Due to saftey consideration, we strongly suggest you to define a class callback
+     *  function as a static function. And passing in this pointer in a static way.
+     * */
+    static void activateCallback(CoreAPI *This, Header *header, UserData userData = 0);
+    static void getVersionCallback(CoreAPI *This, Header *header, UserData userData = 0);
+    static void setControlCallback(CoreAPI *This, Header *header, UserData userData = 0);
+    static void sendToMobileCallback(CoreAPI *This, Header *header, UserData userData = 0);
+    static void setFrequencyCallback(CoreAPI *This, Header *header, UserData userData = 0);
 
   private:
     BroadcastData broadcastData;
@@ -230,9 +261,12 @@ class CoreAPI
 
     uint8_t cblistTail;
     CallBackHandler cbList[CALLBACK_LIST_NUM];
-    CallBackHandler broadcastCallback;
-    CallBackHandler recvCallback;
     CallBackHandler fromMobileCallback;
+    CallBackHandler broadcastCallback;
+    CallBackHandler hotPointCallback;
+    CallBackHandler wayPointCallback;
+    CallBackHandler followCallback;
+    CallBackHandler recvCallback;
 
     VersionData versionData;
     ActivateData accountData;
@@ -242,13 +276,12 @@ class CoreAPI
     SDKFilter filter;
 
   private:
-    void init(HardDriver *Driver, CallBackHandler userRecvCallback,
-              bool userCallbackThread);
+    void init(HardDriver *Driver, CallBackHandler userRecvCallback, bool userCallbackThread);
     void recvReqData(Header *header);
     void appHandler(Header *header);
     void broadcast(Header *header);
 
-    int sendInterface(CallbackCommand *parameter);
+    int sendInterface(Command *parameter);
     int ackInterface(Ack *parameter);
     void sendData(unsigned char *buf);
 
@@ -275,9 +308,8 @@ class CoreAPI
 
   private:
     unsigned short encrypt(unsigned char *pdest, const unsigned char *psrc,
-                           unsigned short w_len, unsigned char is_ack,
-                           unsigned char is_enc, unsigned char session_id,
-                           unsigned short seq_num);
+                           unsigned short w_len, unsigned char is_ack, unsigned char is_enc,
+                           unsigned char session_id, unsigned short seq_num);
 
     void streamHandler(SDKFilter *p_filter, unsigned char in_data);
     void checkStream(SDKFilter *p_filter);
@@ -299,11 +331,11 @@ class CoreAPI
     bool getWayPointData() const;
     bool getFollowData() const;
 
-    void setAccountData(const ActivateData &value);
-    void setDriver(HardDriver *value);
     void setHotPointData(bool value);
     void setWayPointData(bool value);
     void setFollowData(bool value);
+    void setDriver(HardDriver *value);
+    void setAccountData(const ActivateData &value);
 
   private:
     HardDriver *driver;
@@ -311,17 +343,6 @@ class CoreAPI
     bool hotPointData;
     bool wayPointData;
     bool followData;
-};
-
-class Swarm
-{
-  public:
-    Swarm(CoreAPI *ControlAPI = 0);
-    CoreAPI *getApi() const;
-    void setApi(CoreAPI *value);
-
-  private:
-    CoreAPI *api;
 };
 
 } // namespace onboardSDK

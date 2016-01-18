@@ -2,22 +2,19 @@
 
 using namespace DJI::onboardSDK;
 
-DJI::onboardSDK::VirtualRC::VirtualRC(CoreAPI *ContorlAPI)
+DJI::onboardSDK::VirtualRC::VirtualRC(CoreAPI *ControlAPI)
 {
-    api = ContorlAPI;
+    api = ControlAPI;
     resetData();
 }
 
-void VirtualRC::sentContorl(bool enable, VirtualRC::CutOff cutoffType)
+void VirtualRC::setControl(bool enable, VirtualRC::CutOff cutoffType)
 {
     VirtualRCSetting setting;
     setting.cutoff = cutoffType;
     setting.enable = enable ? 1 : 0;
-//    api->send(0, 1, SET_VIRTUALRC, CODE_VIRTUALRC_SETTINGS, &setting,
-//              sizeof(setting));
-	  api->send(0, 0, SET_VIRTUALRC, CODE_VIRTUALRC_SETTINGS, &setting,
+    api->send(0, 1, SET_VIRTUALRC, CODE_VIRTUALRC_SETTINGS, &setting,
               sizeof(setting));
-	//UNENCRYPTED
 }
 
 void VirtualRC::sendData(VirtualRCData Data)
@@ -28,9 +25,7 @@ void VirtualRC::sendData(VirtualRCData Data)
 
 void VirtualRC::sendData()
 {
-    api->send(0, 0, SET_VIRTUALRC, CODE_VIRTUALRC_DATA, &data, sizeof(data));
-		//api->send(0, 1, SET_VIRTUALRC, CODE_VIRTUALRC_DATA, &data, sizeof(data));
-	//UNENCRYPTED
+    api->send(0, 1, SET_VIRTUALRC, CODE_VIRTUALRC_DATA, &data, sizeof(data));
 }
 
 void VirtualRC::resetData()

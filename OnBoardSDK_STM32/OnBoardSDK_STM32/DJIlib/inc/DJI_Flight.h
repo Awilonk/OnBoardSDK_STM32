@@ -1,3 +1,21 @@
+/*! @brief
+ *  @file DJI_Flight.h
+ *  @version 3.0
+ *  @date Dec 16, 2015
+ *
+ *  @abstract
+ *  Flight Control API for DJI onboardSDK library
+ *
+ *  @attention
+ *  Project configuration:
+ *
+ *  @version features:
+ *  -* @version V3.0
+ *  -* DJI-onboard-SDK for Windows,QT,STM32,ROS,Cmake
+ *  -* @date Nov 15, 2015
+ *  -* @author william.wu
+ *
+ * */
 #ifndef DJI_FLIGHT_H
 #define DJI_FLIGHT_H
 
@@ -64,18 +82,24 @@ class Flight
         YAW_GROUND = 0x00,
         YAW_BODY = 0X01
     };
-#endif // SDK_VERSION_2_3
-
-#ifndef SDK_VERSION_2_3
+#else
     enum SmoothMode
     {
         SMOOTH_DISABLE = 0x00,
         SMOOTH_ENABLE = 0x01
     };
-#endif // SDK_VERSION_3_0
+#endif // SDK_VERSION_2_3
 
+    /*! @note
+     *  In order to keep your drone safe,
+     *  you must keep sending FlightData to flight controller.
+     *  Or your drone will hover.
+     *
+     *  Possion control is a open-looped control.
+     *  That means it accept incremental data, not absolute possition data.
+     * */
   public:
-    Flight(CoreAPI *ContorlAPI = 0);
+    Flight(CoreAPI *ControlAPI = 0);
 
     void task(TASK taskname, CallBack TaskCallback = 0, UserData userData = 0);
     void setArm(bool enable, CallBack ArmCallback = 0, UserData userData = 0);

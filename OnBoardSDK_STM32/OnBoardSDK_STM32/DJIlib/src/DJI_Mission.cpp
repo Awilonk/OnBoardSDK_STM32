@@ -1,5 +1,6 @@
 #include "DJI_API.h"
 #include "DJI_Mission.h"
+#include <string.h>
 
 namespace DJI
 {
@@ -9,6 +10,7 @@ namespace onboardSDK
 MissionACKMap missionACK[] = {
     //! @note common ACK code
     { 0x00, " 0x00 Success" },
+    { 0x01, " 0x01 Wrong WayPoint Index"},
     { 0xD0, " 0xD0 Not At Mode F" },
     { 0xD1, " 0xD1 Need obtain control" },
     { 0xD2, " 0xD2 Need close IOC mode" },
@@ -83,6 +85,23 @@ bool CoreAPI::decodeMissionStatus(uint8_t ack)
             return true;
         }
     return false;
+}
+
+void missionCallback(CoreAPI *This, Header *header, UserData userdata __UNUSED)
+{
+    MissionACK ack;
+    if (header->length - EXC_DATA_SIZE <= sizeof(ack))
+    {
+        memcpy((unsigned char *)&ack, (unsigned char *)header + sizeof(Header),
+               (header->length - EXC_DATA_SIZE));
+        if (!This->decodeMissionStatus(ack))
+            API_LOG(This->getDriver(), ERROR_LOG, "decode ack error 0x%X", ack);
+    }
+    else
+    {
+        API_LOG(This->getDriver(), ERROR_LOG, "ACK is exception,seesion id %d,sequence %d\n",
+                header->sessionID, header->sequence_number);
+    }
 }
 
 } // namespace onboardSDK

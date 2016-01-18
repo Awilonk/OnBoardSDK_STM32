@@ -10,6 +10,8 @@
 2. [开始使用](#开始使用)
    - [操作步骤](#操作步骤)
    - [指令格式](#指令格式)
+   - [姿态控制模式](#姿态控制模式)
+   - [获取广播数据](#获取广播数据)
    - [发送指令的顺序](#发送指令的顺序)
 3. [动画示范](#动画示范)  
 
@@ -90,7 +92,44 @@ PC上，所以在PC上的串口调试助手中**发送端选择HEX发送**，**�
 
 *注意:HORI_POS模式的输入量是相对位置的净输入量。净输入量通过GPS或Guidance等传感器获得位置移动的反馈信息，与输入作差后得到。
      为完成飞行的位置控制，需要连续获得反馈并发送该命令，以达到平稳的控制效果。*
+---
+###姿态控制模式
+姿态控制模式必须在起飞后开启。  
+姿态控制模式需要用户自己向飞机发送数据。数据包括  
++ 模式标志字节 ctrl_flag
+- Roll 轴或 X 轴控制量  roll_or_x
+- Pitch 轴或 Y 轴控制量 pitch_or_y
+- Throttle 或 Z 轴控制量 thr_z
+- Yaw 轴控制量   yaw
 
+由于例程使用串口助手给飞控发送命令，使用以下格式给飞机发送姿态数据  
+
+
+0xFA 0xFB 0x04 0x01 **ctrl_flag,  roll_or_x_L,  roll_or_x_H,   pitch_or_y_L,  pitch_or_y_H,   thr_z_L,   thr_z_H,  yaw_L,  yaw_H** 0xFE
+
+
+其中每个数据用两个八位的数据组合而成。默认是整数类型int,数据会被除以100。  
+组合方式是先输入低八位，再输入高八位。  
+例如：输入十进制的2564到 roll_or_x.则先转化为十六进制0x0A04.然后先发送低八位0x04，再发送高八位
+0x0A。    
+即:0xFA 0xFB 0x04 0x01 0x91 **0x0A 0x04**.......0xFE  
+下面是一个示范：  
++ 第一步，起飞。![起飞](/image/takeoff.png)  
+- 第二部，发出期望的姿态指令。例如这里希望飞机的roll以2°的姿态在10m的高度飞行则发出相应指令  ![命令](/image/input1.png)  
++ 第三步，注意观察模拟器的右下角，飞机正在以指定的姿态飞行。  ![飞行](/image/flyaway.png)  
+
+如果对数据换算不是很熟练。可以使用换算姿态数据模式(0x04 0x02)。这个模式的输入逻辑和写入姿态数据的逻辑是一样的，区别是这个模式不会真的往飞机发送命令，而只是返回换算后的值供用户检验。可以把它当成一个计算器使用
+
+
+值得注意的是，只要写入一次数据，stm32就会不断地向飞机发送之前已经写入的数据。要让stm32停止发送只要发送不是 0x04 0x01开头的命令就可以了。
+
+
+更多关于姿态控制请参看手册    
+
+---
+###获取广播数据
+获取广播数据只要发送0x08就可以了。现在打印了当前的时间戳和剩余电量，需要更多数据请自行添加
+![广播](/image/data.png)  
 ---  
 ###发送指令的顺序
 指令的发送是有顺序的
@@ -119,6 +158,8 @@ Use 4-wire-serial interface.If your computer do no has one,USB-TTL serial cable 
 2. [Getting Start](#getting-start)
    - [How to operate](#how-to-operate)
    - [Command Format](#command-format)
+   - [Movement control mode](#movement-control-mode)
+   - [Get Broadcastdata](#get-broadcastdata)
    - [How to send command](#how-to-send-command)
 3. [Gif Demonstration](#gif-demonstration)
 
@@ -201,7 +242,43 @@ Amoug them, 0x04 0x01 means to choose the Localpositionnacigation.
 
 
 *Attention:The input of HORI_POS is a position offset instead of an actual position. This design aims to take both GPS flight and vision-based flight into consideration. If the developer wants to use GPS navigation, the GPS information sent by the UAV can be used to calculate position offset. While in vision-based flight application, developers should have their own positioning device (along with Gudiance or GPS to provide velocity measurement) to do position control. For example, xuhao1 SDK package implements a GPS-based position control where target position can be passed as GPS coordinate.*   
+---  
+###Movement control mode
+Movement control mode can no be use before **Take off**.  
+Attitude control mode needed user sending flight data.data include:
++ Control mode byte
+- Roll or X-axis control value
+- Pitch or Y-axis control value
+- Throttle or Z-axis control value
++ Yaw control value  
 
+Since this example program use serial assistant to send cmd and data to the UAV,we use data format as below to send flight data to the UAV.  
+
+  
+0xFA 0xFB 0x04 0x01 **ctrl_flag,  roll_or_x_L,  roll_or_x_H,   pitch_or_y_L,  pitch_or_y_H,   thr_z_L,   thr_z_H,  yaw_L,  yaw_H** 0xFE
+ 
+Among this frame,every single data consist of two bytes.Default type of data is integer，raw data would be devide by 100.    
+ Low byte comes first and Hight byte comes later.  
+
+
+**e.g.**To enter 2564 to roll_or_x.First,transform to hexadecimal,which is 0xA04.Low byte 0x04 send first,high byte 0x0A comes later.  
+i.e. 0xFA 0xFB 0x04 0x01 0x91 **0x0A 0x04**.......0xFE    
+
+Here is an example:  
++ **step 1**: Take off.![takeoff](/image/takeoff.png)  
+- **step 2**: Send out flight data that request UAV to excute.   
+ ![cmd](/image/input1.png)
++ **step 3**: Pay attention to the lower right corner of simulator,UAV is flying on the movement you specify.  ![flying](/image/flyaway.png)   
+
+
+If you are unfamiliar with this data transform,a convert flight data displayer is provided.The only difference from the Input flight data mode is it would no really send out data,it just display it.You can also use it as a calculator.
+
+
+It's worth noting that,once using Input flight data mode,the data you input would sequential send to the UAV.Sending a cmd start with other from 0x04 0x01 would **stop** sending data,UAV would try to stop and hover there. 
+
+###Get Broadcastdata
+To get broadcastdata send back by the UAV,send cmd 0x08.Timestamp and battery capacity remain are printed now.Add more if you needed.
+![brocastdata](/image/data.png)   
 ---  
 ###How to send command  
 The command should be send in sequence.  

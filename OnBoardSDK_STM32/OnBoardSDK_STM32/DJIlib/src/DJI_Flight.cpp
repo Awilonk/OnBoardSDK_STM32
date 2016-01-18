@@ -3,7 +3,7 @@
 
 using namespace DJI::onboardSDK;
 
-Flight::Flight(DJI::onboardSDK::CoreAPI *ContorlAPI) { api = ContorlAPI; }
+Flight::Flight(DJI::onboardSDK::CoreAPI *ControlAPI) { api = ControlAPI; }
 
 CoreAPI *Flight::getApi() const { return api; }
 
@@ -14,33 +14,22 @@ void Flight::task(TASK taskname, CallBack TaskCallback, UserData userData)
     taskData.cmd_data = taskname;
     taskData.cmd_sequence++;
 
-    api->send(2, 0, SET_CONTROL, CODE_TASK, (unsigned char *)&taskData,
+    api->send(2, 1, SET_CONTROL, CODE_TASK, (unsigned char *)&taskData,
               sizeof(taskData), 100, 3,
               TaskCallback ? TaskCallback : Flight::taskCallback, userData);
-//		api->send(2, 1, SET_CONTROL, CODE_TASK, (unsigned char *)&taskData,
-//						sizeof(taskData), 100, 3,
-//						TaskCallback ? TaskCallback : Flight::taskCallback, userData);
-							//UNENCRYPTED
-							
 }
 
 void Flight::setArm(bool enable, CallBack ArmCallback, UserData userData)
 {
     uint8_t data = enable ? 1 : 0;
-    api->send(2, 0	, SET_CONTROL, CODE_SETARM, &data, 1, 0, 1,
+    api->send(2, 1, SET_CONTROL, CODE_SETARM, &data, 1, 0, 1,
               ArmCallback ? ArmCallback : Flight::armCallback, userData);
-//	  api->send(2, 1, SET_CONTROL, CODE_SETARM, &data, 1, 0, 1,
-//              ArmCallback ? ArmCallback : Flight::armCallback, userData);
-	//UNENCRYPTED
 }
 
 void Flight::setFlight(FlightData *data)
 {
-//    api->send(0, 1, SET_CONTROL, CODE_CONTROL, (unsigned char *)data,
-//              sizeof(FlightData));
-	   api->send(0, 0, SET_CONTROL, CODE_CONTROL, (unsigned char *)data,
+    api->send(0, 1, SET_CONTROL, CODE_CONTROL, (unsigned char *)data,
               sizeof(FlightData));
-		 //UNENCRYPTED
 }
 
 QuaternionData Flight::getQuaternion() const

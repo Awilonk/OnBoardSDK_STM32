@@ -10,7 +10,7 @@ void tryHotpoint()
 	 
 	myGPSData.altitude = 50;
 	myGPSData.latitude = coreApi->getBroadcastData().pos.latitude;
-	myGPSData.longtitude = coreApi->getBroadcastData().pos.longtitude;
+	myGPSData.longtitude = coreApi->getBroadcastData().pos.longitude;
 	
 	hotpoint.setHotPoint(myGPSData);
 	hotpoint.setPalstance(15);

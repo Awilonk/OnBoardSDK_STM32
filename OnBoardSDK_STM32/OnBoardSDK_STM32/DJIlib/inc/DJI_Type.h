@@ -1,8 +1,42 @@
+/*! @brief
+ *  @file DJI_Type.h
+ *  @version 3.0
+ *  @date Dec 16, 2015
+ *
+ *  @abstract
+ *  Type definition for DJI onboardSDK library
+ *  Maintain officially
+ *
+ *  @attention
+ *  Maintain officially, readonly for users
+ *  Do not modify any definition in this file,
+ *  if you are not sure what are you doing exactlly,
+ *  or we will not provide any support.
+ *
+ *  Project configuration:
+ *
+ *  @version features:
+ *  -* @version V3.0
+ *  -* DJI-onboard-SDK for Windows,QT,STM32,ROS,Cmake
+ *  -* @date Dec 16, 2015
+ *  -* @author william.wu
+ *
+ * */
+
+/*! @attention
+ *  Maintain officially, readonly for users
+ *  Do not modify any definition in this file,
+ *  if you are not sure what are you doing exactlly,
+ *  or we will not provide any support.
+ * */
+
 #ifndef DJI_TYPE
 #define DJI_TYPE
 
 #include "DJI_Config.h"
 #include <stdio.h>
+
+#define NAME(x) #x
 
 #ifdef __GNUC__
 #define __UNUSED __attribute__((__unused__))
@@ -82,17 +116,17 @@ typedef struct CallBackHandler
     UserData userData;
 }CallBackHandler;
 
-typedef struct CallbackCommand
+typedef struct Command
 {
     unsigned short session_mode : 2;
     unsigned short need_encrypt : 1;
     unsigned short retry_time : 13;
     unsigned short timeout; // unit is ms
-    unsigned int length;
-    unsigned char *buf;
+    size_t length;
+    uint8_t *buf;
     CallBack handler;
     UserData userData;
-} CallbackCommand;
+} Command;
 
 typedef struct SDKFilter
 {
@@ -147,6 +181,7 @@ typedef struct Ack
 #pragma pack(1)
 
 typedef uint8_t BatteryData;
+typedef uint8_t MissionACK;
 
 typedef struct GimbalAngleData
 {
@@ -196,7 +231,7 @@ typedef struct VelocityData
 typedef struct PossitionData
 {
     float64_t latitude;
-    float64_t longtitude;
+    float64_t longitude;
     float32_t altitude;
     float32_t height;
     uint8_t health;
@@ -271,6 +306,7 @@ typedef struct
 
 typedef struct BroadcastData
 {
+    unsigned short dataFlag;
     TimeStampData timeStamp;
     QuaternionData q;
     CommonData a;

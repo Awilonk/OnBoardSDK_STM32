@@ -4,8 +4,8 @@
 
 using namespace DJI::onboardSDK;
 
-CoreAPI::CoreAPI(HardDriver *Driver, bool userCallbackThread,
-                 CallBack userRecvCallback, UserData UserData)
+CoreAPI::CoreAPI(HardDriver *Driver, bool userCallbackThread, CallBack userRecvCallback,
+                 UserData UserData)
 {
     CallBackHandler handler;
     handler.callback = userRecvCallback;
@@ -13,7 +13,8 @@ CoreAPI::CoreAPI(HardDriver *Driver, bool userCallbackThread,
     init(Driver, handler, userCallbackThread);
 }
 
-void CoreAPI::init(HardDriver *Driver, CallBackHandler userRecvCallback,bool userCallbackThread)
+void CoreAPI::init(HardDriver *Driver, CallBackHandler userRecvCallback,
+                   bool userCallbackThread)
 {
     driver = Driver;
     // driver->init();
@@ -34,26 +35,28 @@ void CoreAPI::init(HardDriver *Driver, CallBackHandler userRecvCallback,bool use
     broadcastData.timeStamp.time = 0;
     broadcastData.timeStamp.asr_ts = 0;
     broadcastData.timeStamp.sync_flag = 0;
-#endif
+#else
+    broadcastData.timeStamp = 0;
+#endif // SDK_VERSION_2_3
 
     hotPointData = true;
+    followData = true;
     callbackThread = userCallbackThread;
 
     setup();
 }
 
-CoreAPI::CoreAPI(HardDriver *Driver, CallBackHandler userRecvCallback,
-                 bool userCallbackThread)
+CoreAPI::CoreAPI(HardDriver *Driver, CallBackHandler userRecvCallback, bool userCallbackThread)
 {
-    init( Driver, userRecvCallback,userCallbackThread);
+    init(Driver, userRecvCallback, userCallbackThread);
     // getVersion();
 }
 
-void CoreAPI::send(unsigned char session_mode, unsigned char is_enc,
-                   CMD_SET cmd_set, unsigned char cmd_id, void *pdata, int len,
-                   CallBack ack_callback, int timeout, int retry_time)
+void CoreAPI::send(unsigned char session_mode, unsigned char is_enc, CMD_SET cmd_set,
+                   unsigned char cmd_id, void *pdata, int len, CallBack ack_callback,
+                   int timeout, int retry_time)
 {
-    CallbackCommand param;
+    Command param;
     unsigned char *ptemp = (unsigned char *)encodeSendData;
     *ptemp++ = cmd_set;
     *ptemp++ = cmd_id;
@@ -74,12 +77,11 @@ void CoreAPI::send(unsigned char session_mode, unsigned char is_enc,
     sendInterface(&param);
 }
 
-void CoreAPI::send(unsigned char session_mode, unsigned char is_enc,
-                   CMD_SET cmd_set, unsigned char cmd_id, void *pdata, int len,
-                   int timeout, int retry_time, CallBack ack_handler,
-                   UserData userData)
+void CoreAPI::send(unsigned char session_mode, bool is_enc, CMD_SET cmd_set,
+                   unsigned char cmd_id, void *pdata, size_t len, int timeout, int retry_time,
+                   CallBack ack_handler, UserData userData)
 {
-    CallbackCommand param;
+    Command param;
     unsigned char *ptemp = (unsigned char *)encodeSendData;
     *ptemp++ = cmd_set;
     *ptemp++ = cmd_id;
@@ -93,14 +95,14 @@ void CoreAPI::send(unsigned char session_mode, unsigned char is_enc,
     param.retry_time = retry_time;
 
     param.timeout = timeout;
-    param.need_encrypt = is_enc;
+    param.need_encrypt = is_enc ? 1 : 0;
 
     param.userData = userData;
 
     sendInterface(&param);
 }
 
-void CoreAPI::send(CallbackCommand *parameter) { sendInterface(parameter); }
+void CoreAPI::send(Command *parameter) { sendInterface(parameter); }
 
 void CoreAPI::ack(req_id_t req_id, unsigned char *ackdata, int len)
 {
@@ -127,22 +129,20 @@ void CoreAPI::getVersion(CallBack callback, UserData userData)
     unsigned retry_time = 3;
     unsigned char cmd_data = 0;
 
-    send(2, 0, SET_ACTIVATION, CODE_GETVERSION, (unsigned char *)&cmd_data, 1,
-         cmd_timeout, retry_time,
-         callback ? callback : CoreAPI::getVersionCallback, userData);
+    send(2, 0, SET_ACTIVATION, CODE_GETVERSION, (unsigned char *)&cmd_data, 1, cmd_timeout,
+         retry_time, callback ? callback : CoreAPI::getVersionCallback, userData);
 }
 
 void CoreAPI::activate(ActivateData *data, CallBack callback, UserData userData)
 {
     accountData = *data;
-
+    for (int i = 0; i < 32; ++i) data->app_bundle_id[i] = '9'; //! @note for ios verification
     send(2, 0, SET_ACTIVATION, CODE_ACTIVATE, (unsigned char *)&accountData,
          sizeof(accountData) - sizeof(char *), 1000, 3,
          callback ? callback : CoreAPI::activateCallback, userData);
 }
 
-void CoreAPI::sendToMobile(uint8_t *data, uint8_t len, CallBack callback,
-                           UserData userData)
+void CoreAPI::sendToMobile(uint8_t *data, uint8_t len, CallBack callback, UserData userData)
 {
     if (len > 100)
     {
@@ -153,10 +153,17 @@ void CoreAPI::sendToMobile(uint8_t *data, uint8_t len, CallBack callback,
          callback ? callback : CoreAPI::sendToMobileCallback, userData);
 }
 
-void CoreAPI::setBroadcastFeq(uint8_t *data, CallBack callback,
-                              UserData userData)
+void CoreAPI::setBroadcastFreq(uint8_t *dataLenIs16, CallBack callback,
+                               UserData userData)
 {
-    send(2, 0, SET_ACTIVATION, CODE_FREQUENCY, data, 16, 100, 1,
+    for (int i = 0; i < 16; ++i)
+    {
+        if (dataLenIs16[i] < 12)
+            dataLenIs16[i] = (dataLenIs16[i] > 5 ? 5 : 0);
+        else
+            dataLenIs16[i] = 0;
+    }
+    send(2, 0, SET_ACTIVATION, CODE_FREQUENCY, dataLenIs16, 16, 100, 1,
          callback ? callback : CoreAPI::setFrequencyCallback, userData);
 }
 
@@ -176,19 +183,15 @@ bool CoreAPI::getFollowData() const { return followData; }
 void CoreAPI::setControl(bool enable, CallBack callback, UserData userData)
 {
     unsigned char data = enable ? 1 : 0;
-//    send(2, 1, SET_CONTROL, CODE_SETCONTROL, &data, 1, 500, 2,
-//         callback ? callback : CoreAPI::setControlCallback, userData);
-	    send(2, 0, SET_CONTROL, CODE_SETCONTROL, &data, 1, 500, 2,
+    send(2, 1, SET_CONTROL, CODE_SETCONTROL, &data, 1, 500, 2,
          callback ? callback : CoreAPI::setControlCallback, userData);
-	//UNENCRYPTED
 }
 
 HardDriver *CoreAPI::getDriver() const { return driver; }
 
 void CoreAPI::setDriver(HardDriver *value) { driver = value; }
 
-void CoreAPI::getVersionCallback(CoreAPI *This, Header *header,
-                                 UserData userData __UNUSED)
+void CoreAPI::getVersionCallback(CoreAPI *This, Header *header, UserData userData __UNUSED)
 {
     unsigned char *ptemp = ((unsigned char *)header) + sizeof(Header);
 
@@ -203,27 +206,21 @@ void CoreAPI::getVersionCallback(CoreAPI *This, Header *header,
 #endif
     memcpy(This->versionData.version_name, ptemp, 32);
 
-    API_LOG(This->driver, STATUS_LOG, "version ack = %d\n",
-            This->versionData.version_ack);
-    API_LOG(This->driver, STATUS_LOG, "version crc = 0x%X\n",
-            This->versionData.version_crc);
+    API_LOG(This->driver, STATUS_LOG, "version ack = %d\n", This->versionData.version_ack);
+    API_LOG(This->driver, STATUS_LOG, "version crc = 0x%X\n", This->versionData.version_crc);
 #ifdef SDK_VERSION_3_1
-    API_LOG(This->driver, STATUS_LOG, "version ID = %s\n",
-            This->versionData.version_ID);
+    API_LOG(This->driver, STATUS_LOG, "version ID = %s\n", This->versionData.version_ID);
 #endif
-    API_LOG(This->driver, STATUS_LOG, "version name = %s\n",
-            This->versionData.version_name);
+    API_LOG(This->driver, STATUS_LOG, "version name = %s\n", This->versionData.version_name);
 }
 
-void CoreAPI::activateCallback(CoreAPI *This, Header *header,
-                               UserData userData __UNUSED)
+void CoreAPI::activateCallback(CoreAPI *This, Header *header, UserData userData __UNUSED)
 {
 
     unsigned short ack_data;
     if (header->length - EXC_DATA_SIZE <= 2)
     {
-        memcpy((unsigned char *)&ack_data,
-               ((unsigned char *)header) + sizeof(Header),
+        memcpy((unsigned char *)&ack_data, ((unsigned char *)header) + sizeof(Header),
                (header->length - EXC_DATA_SIZE));
         switch (ack_data)
         {
@@ -247,8 +244,7 @@ void CoreAPI::activateCallback(CoreAPI *This, Header *header,
                 API_LOG(This->driver, ERROR_LOG, "activate encode error\n");
                 break;
             case ACK_ACTIVE_APP_NOT_CONNECTED:
-                API_LOG(This->driver, ERROR_LOG,
-                        "activate DJIGO not connected\n");
+                API_LOG(This->driver, ERROR_LOG, "activate DJIGO not connected\n");
                 break;
             case ACK_ACTIVE_NO_INTERNET:
                 API_LOG(This->driver, ERROR_LOG,
@@ -260,19 +256,16 @@ void CoreAPI::activateCallback(CoreAPI *This, Header *header,
                                                  "available SDK ID\n");
                 break;
             case ACK_ACTIVE_ACCESS_LEVEL_ERROR:
-                API_LOG(This->driver, ERROR_LOG,
-                        "activate Wrong SDK permission\n");
+                API_LOG(This->driver, ERROR_LOG, "activate Wrong SDK permission\n");
                 break;
             case ACK_ACTIVE_VERSION_ERROR:
-                API_LOG(This->driver, ERROR_LOG,
-                        "activate SDK version did not match\n");
+                API_LOG(This->driver, ERROR_LOG, "activate SDK version did not match\n");
                 This->getVersion();
                 break;
             default:
                 if (!This->decodeACKStatus(ack_data))
                 {
-                    API_LOG(This->driver, ERROR_LOG,
-                            "While calling this function");
+                    API_LOG(This->driver, ERROR_LOG, "While calling this function");
                 }
                 break;
         }
@@ -282,20 +275,17 @@ void CoreAPI::activateCallback(CoreAPI *This, Header *header,
     }
     else
     {
-        API_LOG(This->driver, ERROR_LOG,
-                "ACK is exception,seesion id %d,sequence %d\n",
+        API_LOG(This->driver, ERROR_LOG, "ACK is exception,seesion id %d,sequence %d\n",
                 header->sessionID, header->sequence_number);
     }
 }
 
-void CoreAPI::sendToMobileCallback(CoreAPI *This, Header *header,
-                                   UserData userData __UNUSED)
+void CoreAPI::sendToMobileCallback(CoreAPI *This, Header *header, UserData userData __UNUSED)
 {
     unsigned short ack_data = AC_COMMON_NO_RESPONSE;
     if (header->length - EXC_DATA_SIZE <= 2)
     {
-        memcpy((unsigned char *)&ack_data,
-               ((unsigned char *)header) + sizeof(Header),
+        memcpy((unsigned char *)&ack_data, ((unsigned char *)header) + sizeof(Header),
                (header->length - EXC_DATA_SIZE));
         if (!This->decodeACKStatus(ack_data))
         {
@@ -304,8 +294,7 @@ void CoreAPI::sendToMobileCallback(CoreAPI *This, Header *header,
     }
     else
     {
-        API_LOG(This->driver, ERROR_LOG,
-                "ACK is exception,seesion id %d,sequence %d\n",
+        API_LOG(This->driver, ERROR_LOG, "ACK is exception,seesion id %d,sequence %d\n",
                 header->sessionID, header->sequence_number);
     }
 }
@@ -317,8 +306,7 @@ void CoreAPI::setFrequencyCallback(CoreAPI *This __UNUSED, Header *header,
 
     if (header->length - EXC_DATA_SIZE <= 2)
     {
-        memcpy((unsigned char *)&ack_data,
-               ((unsigned char *)header) + sizeof(Header),
+        memcpy((unsigned char *)&ack_data, ((unsigned char *)header) + sizeof(Header),
                (header->length - EXC_DATA_SIZE));
     }
     switch (ack_data)
@@ -338,31 +326,27 @@ void CoreAPI::setFrequencyCallback(CoreAPI *This __UNUSED, Header *header,
     }
 }
 
-void CoreAPI::setControlCallback(CoreAPI *This, Header *header,
-                                 UserData userData __UNUSED)
+void CoreAPI::setControlCallback(CoreAPI *This, Header *header, UserData userData __UNUSED)
 {
     unsigned short ack_data = AC_COMMON_NO_RESPONSE;
     unsigned char data = 0x1;
 
-    if (header->length - EXC_DATA_SIZE <= 2)
+    if (header->length - EXC_DATA_SIZE <= sizeof(ack_data))
     {
-        memcpy((unsigned char *)&ack_data,
-               ((unsigned char *)header) + sizeof(Header),
+        memcpy((unsigned char *)&ack_data, ((unsigned char *)header) + sizeof(Header),
                (header->length - EXC_DATA_SIZE));
     }
     else
     {
-        API_LOG(This->driver, ERROR_LOG,
-                "ACK is exception,seesion id %d,sequence %d\n",
+        API_LOG(This->driver, ERROR_LOG, "ACK is exception,seesion id %d,sequence %d\n",
                 header->sessionID, header->sequence_number);
     }
 
     switch (ack_data)
     {
         case ACK_SETCONTROL_NEED_MODE_F:
-            API_LOG(This->driver, STATUS_LOG,
-                    "Obtain control failed, Conditions did not "
-                    "satisfied");
+            API_LOG(This->driver, STATUS_LOG, "Obtain control failed, Conditions did not "
+                                              "satisfied");
             break;
         case ACK_SETCONTROL_RELEASE_SUCCESS:
             API_LOG(This->driver, STATUS_LOG, "release control successfully\n");
@@ -382,8 +366,7 @@ void CoreAPI::setControlCallback(CoreAPI *This, Header *header,
                        CoreAPI::setControlCallback);
             break;
         case ACK_SETCONTROL_IOC:
-            API_LOG(This->driver, STATUS_LOG,
-                    "IOC mode opening can not obtain control\n");
+            API_LOG(This->driver, STATUS_LOG, "IOC mode opening can not obtain control\n");
             break;
         default:
             if (!This->decodeACKStatus(ack_data))

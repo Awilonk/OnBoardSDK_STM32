@@ -7,7 +7,7 @@ extern FlightData flightData ;
 
 void User_Activate()
 {				
-		char key_buf[65] = "f3200e2b6a9dfeaa365d553a5fe905b417260540e56481f45a8d597cdf17c201";   /* Input your app_key */
+		static char key_buf[65] = "f3200e2b6a9dfeaa365d553a5fe905b417260540e56481f45a8d597cdf17c201";   /* Input your app_key */
 		char app_bundle_id[32] = "1234567890123456789012";
 	
 		ActivateData user_act_data;

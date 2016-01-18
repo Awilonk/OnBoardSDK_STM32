@@ -6,13 +6,13 @@ VirtualRCData VRCdataTurnF={1024,1024,1024,1024,1024,1024,496,1024,1024,1024,102
  
 void VRC_TakeControl()
 {
-	virtualrc.sentContorl(1,virtualrc.CutOff_ToLogic);
+	virtualrc.setControl(1,virtualrc.CutOff_ToLogic);
 	myVRCdata = VRCdataTurnF;
 }
 
 void VRCResetData()
 {
-		virtualrc.sentContorl(1,virtualrc.CutOff_ToLogic);
+		virtualrc.setControl(1,virtualrc.CutOff_ToLogic);
 		myVRCdata.roll = 1024;
     myVRCdata.pitch = 1024;
     myVRCdata.throttle = 1024;

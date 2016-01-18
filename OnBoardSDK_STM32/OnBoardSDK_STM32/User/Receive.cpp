@@ -12,7 +12,7 @@ int Rx_Handle_Flag=0;
 extern CoreAPI *coreApi;
 extern Flight flight ;
 extern FlightData flightData ;
-
+BroadcastData broadcastdata;
 
 float Hex2int(char HighBit,char LowBit)
 {	//turn two 8-bits hex number into a signed integer,which range of-32767~32727
@@ -81,9 +81,9 @@ void Rx_buff_Handler()      //when USART recive a 0xfe,start handle command
 						flightData.yaw = Hex2int(Rx_buff[11],Rx_buff[12]);
 						flight.setFlight(&flightData);
 						TIM_Cmd(TIM2,ENABLE);
-						printf("x =%f\n",Hex2int(Rx_buff[5],Rx_buff[6]));
-						printf("y =%f\n",Hex2int(Rx_buff[7],Rx_buff[8]));
-						printf("z =%f\n",Hex2int(Rx_buff[9],Rx_buff[10]));
+						printf("roll_or_x =%f\n",Hex2int(Rx_buff[5],Rx_buff[6]));
+						printf("pitch_or_y =%f\n",Hex2int(Rx_buff[7],Rx_buff[8]));
+						printf("thr_z =%f\n",Hex2int(Rx_buff[9],Rx_buff[10]));
 						printf("yaw =%f\n\n",Hex2int(Rx_buff[11],Rx_buff[12]));
 					}
 					if(Rx_buff[3]==0x00)
@@ -97,10 +97,10 @@ void Rx_buff_Handler()      //when USART recive a 0xfe,start handle command
 					}
 						if(Rx_buff[3]==0x02)
 						{														//for display ur hex2int
-							printf("\nx =%f\n",Hex2int(Rx_buff[5],Rx_buff[6]));
-							printf("y =%f\n",Hex2int(Rx_buff[7],Rx_buff[8]));
-							printf("z =%f\n",Hex2int(Rx_buff[9],Rx_buff[10]));
-							printf("yaw =%f\n",Hex2int(Rx_buff[11],Rx_buff[12]));
+							printf("roll_or_x =%f\n",Hex2int(Rx_buff[5],Rx_buff[6]));
+							printf("pitch_or_y =%f\n",Hex2int(Rx_buff[7],Rx_buff[8]));
+							printf("thr_z =%f\n",Hex2int(Rx_buff[9],Rx_buff[10]));
+							printf("yaw =%f\n\n",Hex2int(Rx_buff[11],Rx_buff[12]));
 							TIM_Cmd(TIM2,ENABLE);
 						}
 				}
@@ -140,6 +140,12 @@ void Rx_buff_Handler()      //when USART recive a 0xfe,start handle command
 			if(Rx_buff[2]==0x07)             //HotPoint test    07
 			{
 				tryHotpoint();
+			}
+			if(Rx_buff[2]==0x08)             //test BroadCastData
+			{
+				broadcastdata = coreApi->getBroadcastData();
+				printf("TimeStamp is %d\r\n",broadcastdata.timeStamp);
+				printf("Battery capacity remains %d percent\r\n",broadcastdata.capacity);
 			}
 		}
 		else if(Rx_buff[1]==0xFC)   

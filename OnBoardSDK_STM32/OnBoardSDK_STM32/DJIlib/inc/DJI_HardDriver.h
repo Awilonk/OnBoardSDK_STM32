@@ -20,6 +20,7 @@
 #define DJI_HARDDRIVER_H
 
 #include <stdint.h>
+#include <time.h>
 #include "DJI_Type.h"
 #include "stm32f4xx.h"
 extern uint32_t tick;
@@ -61,21 +62,32 @@ class HardDriver
      *  void lockMSG();/ void freeMSG();
      *  @brief provide a mutex for multi-thread. when operating messages.
      *
+     *  void displayLog(char *buf);
+     *  @brief Micro "API_LOG" invoked this function, to pass datalog.
+     *  In order to pass data through different stream or channel.
+     *  We abstract this virtual function for user.
+     *  And different from others, this interface is not a pure virtual funcion.
+     *  The default data-passing channel is stdout (printf).
+     *  See also "DJI_HardDriver.cpp".
+     *
+     *  void inputStream(char *buf,size_t size);
+     *  @brief input data for DJI_Script
+     *
      *  @attention
      *  when writting and reading data, there might have multi-thread problems.
      *  Abstract class HardDriver did not consider these issue.
      *  Please be careful when you are going to implement send and readall
-     *funtions.
+     *  funtions.
      *
      *  @note
      *  we strongly suggest you to inherit this class in your own file, not just
-     *implement
+     *  implement
      *  it in DJI_HardDriver.cpp or inside this class
      *
      * */
   public:
     virtual void init() = 0;
-    virtual unsigned int getTimeStamp() = 0;
+    virtual time_t getTimeStamp() = 0;
     virtual size_t send(const uint8_t *buf, size_t len) = 0;
     virtual size_t readall(uint8_t *buf, size_t maxlen) = 0;
 
@@ -87,8 +99,8 @@ class HardDriver
     virtual void freeMSG() = 0;
 
   public:
-
     virtual void displayLog(char *buf = 0);
+    virtual void inputStream(char *buf,size_t size);
 };
 } // namespace onboardSDK
 } // namespace DJI
@@ -130,5 +142,4 @@ class STM32F4 : public DJI::onboardSDK::HardDriver
 					  void lockMSG()  {;}
 					  void freeMSG()  {;}
 };
-
 #endif // DJI_HARDDRIVER_H
