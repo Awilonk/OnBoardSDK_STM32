@@ -23,7 +23,7 @@
 
 
 ##硬件接口
-  使用USART2作为Debug通道。端口为PB10，PB11分别对应USART2的TX、RX，波特率为**115200**，此处的波特率必须和串口调试助手的波特率**一致**；  
+  使用USART2作为Debug通道。端口为PB10，PB11分别对应stm32上USART2的TX、RX，连接串口等外部设备时将外部串口的**RX**端接到stm32的**Rx**上，波特率为**115200**，此处的波特率必须和串口调试助手的波特率**一致**；  
 使用USART3作为和M100上的N1飞控通信的接口。端口为PA2、PA3分别对应USART3的TX、RX，和N1飞控的“USART_CAN2”端口连接。波特率为 **921600**.此处的波特率必须和N1飞控的波特率**一致**，可以在DJI调参软件中调整；
 ![硬件串口](image/硬件串口.png)
 ##开始使用
@@ -170,7 +170,7 @@ Use 4-wire-serial interface.If your computer do no has one,USB-TTL serial cable 
 
 
 ##Hardware Installation
-Use USART2 for debug.PB10,PB11 as TX,RX.BaudRate is **115200**.BaudRate here must be **the same as** BaudRate in your Serial debugging assistant.;
+Use USART2 for debug.PB10,PB11 as stm32's TX,RX.When connect to an external device ,link stm32-board's **Rx** to your device's **TX**.BaudRate is **115200**.BaudRate here must be **the same as** BaudRate in your Serial debugging assistant.;  
 
 Use USART3 for communicating with M100.PA2,PA3 as TX,RX,which should be plug in the "USART_CAN2" prot.The BaudRate here should equal to BaudRate of N1 flight control system on M100,which can be adjust on
 "DJI Assistant".
