@@ -54,7 +54,7 @@ int main()
 	printf("Initializing...\r\n");
 	
 	delay_nms(1000);
-	coreApi->getVersion();
+	coreApi->getSDKVersion();
 	delay_nms(20);
 	printf("Done~!\r\n");
 	
