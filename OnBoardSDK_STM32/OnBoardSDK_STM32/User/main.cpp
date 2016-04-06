@@ -45,8 +45,6 @@ FlightData flightData ;
 VirtualRC virtualrc = VirtualRC(coreApi); 
 VirtualRCData myVRCdata={1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024,1024};
 
-
-
 int main()
 { 
 	BSPinit();
